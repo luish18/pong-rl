@@ -17,6 +17,7 @@ class ReplayBuffer:
 
         self.states = np.zeros((self.max_size, INPUT_SIZE), dtype = np.float32)
         self.states2 = np.zeros((self.max_size, INPUT_SIZE), dtype = np.float32)
+
         self.rewards = np.zeros(self.max_size, dtype = np.float32)
         self.actions = np.zeros(self.max_size, dtype = np.int32)
         self.terminal = np.zeros(self.max_size, dtype = np.int32)
@@ -25,9 +26,18 @@ class ReplayBuffer:
         """Adiciona uma transição ao replay buffer.
 
         Args:
-            transition (tuple): uma tupla representando a transição.
+            transition (tuple): uma tupla representando a transição no formato (estado atual, estado seguinte, recompensa, acao, terminado).
+            estado atual e estado seguinte são re
         """
-        pass
+        index = self.transition_counter % self.max_size
+
+        self.states[index] = transition[0]
+        self.states2[index] = transition[1]
+        self.rewards[index] = transition[2]
+        self.actions[index] = transition[3]
+        self.terminal[index] = transition[4]
+
+        self.transition_counter += 1
 
     def sample_transitions(self, num_samples):
         """Retorna uma lista com transições amostradas aleatoriamente.
