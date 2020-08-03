@@ -49,11 +49,11 @@ class ReplayBuffer:
 
     def get_size(self):
         """Retorna o número de transições armazenadas pelo buffer."""
-        pass
+        return min(self.transition_counter, self.max_size)
 
     def get_max_size(self):
         """Retorna o número máximo de transições armazenadas pelo buffer."""
-        pass
+        return self.max_size
 
 
 class DQNAgent:
