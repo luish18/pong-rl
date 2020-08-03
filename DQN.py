@@ -45,7 +45,16 @@ class ReplayBuffer:
         Args:
             num_samples (int): o número de transições desejadas.
         """
-        pass
+        index_range = min(self.transition_counter, self.max_size)
+        sample = np.random.choice(index_range)
+
+        states = self.states[sample]
+        states2 = self.states[sample]
+        rewards = self.rewards[sample]
+        actions = self.actions[sample]
+        terminal = self.termina[sample]
+
+        return states, states2, rewards, actions, terminal
 
     def get_size(self):
         """Retorna o número de transições armazenadas pelo buffer."""
