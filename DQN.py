@@ -1,4 +1,7 @@
 import gym
+import numpy as np
+
+INPUT_SIZE = 2
 
 class ReplayBuffer:
     """Um buffer que armazena transições e permite a amostragem de transições aleatórias."""
@@ -9,7 +12,14 @@ class ReplayBuffer:
         Args:
             max_size (int): número máximo de transições armazenadas pelo buffer.
         """
-        pass
+        self.max_size = max_size
+        self.transition_counter = 0
+
+        self.states = np.zeros((self.max_size, INPUT_SIZE), dtype = np.float32)
+        self.states2 = np.zeros((self.max_size, INPUT_SIZE), dtype = np.float32)
+        self.rewards = np.zeros(self.max_size, dtype = np.float32)
+        self.actions = np.zeros(self.max_size, dtype = np.int32)
+        self.terminal = np.zeros(self.max_size, dtype = np.int32)
 
     def add_transition(self, transition):
         """Adiciona uma transição ao replay buffer.
