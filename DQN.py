@@ -1,5 +1,10 @@
 import gym
 import numpy as np
+from random import random
+import torch 
+import torch.nn.functional as F
+import torch.nn as nn
+import torch.optim as optim
 
 INPUT_SIZE = 2
 
@@ -71,7 +76,8 @@ class DQNAgent:
     def __init__(self, state_dim, action_dim, architecture,
                  buffer_size=100_000,
                  batch_size=128,
-                 gamma=1.00):
+                 gamma=1.00,
+                 alpha=0.5):
         """Cria um agente de DQN com os hiperparâmetros especificados
 
         Args:
@@ -82,8 +88,29 @@ class DQNAgent:
             buffer_size (int, optional): tamanho máximo do replay buffer.
             batch_size (int, optional): número de transições utilizadas por batch.
             gamma (float, optional): fator de desconto utilizado no calculo do retorno.
+            alpha (float, optional): learning rate
         """
-        pass
+        self.device = torch.device("cuda" if torch.cuda_is_available() else "cpu")
+
+        self._buffer_size = buffer_size
+        self._batch_size = batch_size
+        self._gamma = gamma  
+        self._actions = action_dim
+        self._states = state_dim
+        self._alpha = alpha
+
+        #adiciona camada de entrada da rede
+        self.dqn = nn.Sequential(nn.Linear(self._states, architecture[0]),
+                                nn.ReLU())
+        
+        #adiciona hidden layers da rede
+        for layer in architecture: 
+            if (architecture[0] != layer) and (architecture[-1] != layer):
+                self.dqn = nn.Sequential(nn.Linear(self.dqn, layer), 
+                                        nn.ReLU())
+
+        self.dqn = nn.Sequential(nn.linear(self.dqn, self._actions))
+        self.optmizer = optim.Adam(self.dqn.parameters(), lr=self._alpha)
 
     def act(self, state, epsilon=0):
         """Retorna a ação tomada pelo agente no estado `state`.
@@ -93,7 +120,15 @@ class DQNAgent:
             epsilon (int, optional): o valor de epsilon a ser considerado
                                      na política epsilon-greedy.
         """
-        pass
+        state = torch.Tensor(state).unsqueeze(0).to(self.device, dtype=torch.float)
+        chance = random()
+
+        if chance < espsilon:
+            action = self._actions.sample()
+        else:
+            action = self.dqn(state).max(1)
+
+        return action
 
     def optimize(self):
         """Roda um passo de otimização da DQN.
