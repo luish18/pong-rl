@@ -188,20 +188,20 @@ if __name__ == '__main__':
 
     # Hiperparâmetros da política epsilon-greedy
     initial_eps = 1
-    min_eps = 0.01
-    eps_decay = .85
+    min_eps = 0.001
+    eps_decay = .95
     eps = initial_eps
     gamma = .995
 
     # Número total de episódios
-    num_episodes = 200
+    num_episodes = 100
 
     agent = DQNAgent(action_dim=3,
                      state_dim=2,
                      architecture=[32, 32],
-                     batch_size=512,
+                     batch_size=1024,
                      gamma=gamma,
-                     alpha=0.5)
+                     alpha=0.005)
     wins = 0
     for episode in range(num_episodes):
         
@@ -220,13 +220,15 @@ if __name__ == '__main__':
             agent.add_to_replay(state, next_state, reward, action, done)
             state = next_state
 
+            agent.optimize()            
+
             steps += 1
             q_value += value
             ep_reward += reward
 
         if ep_reward > 0:
             wins += 1
-        agent.optimize()
+        
         eps = max(eps*eps_decay, min_eps)
         print(f"episode {episode}|avg_q = {q_value/steps}|ep_reward = {ep_reward}|steps = {steps}|wins = {wins}")
 
