@@ -220,12 +220,13 @@ if __name__ == '__main__':
             agent.add_to_replay(state, next_state, reward, action, done)
             state = next_state
 
-            agent.optimize()            
+                        
 
             steps += 1
             q_value += value
             ep_reward += reward
-
+            
+        agent.optimize()
         if ep_reward > 0:
             wins += 1
         
